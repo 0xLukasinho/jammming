@@ -1,0 +1,22 @@
+.UserPlaylists {
+    width: 25%;
+    border: 1px solid white;
+    padding: .88rem;
+    background-color: rgba(1, 12, 63, 0.7);   
+}
+
+.UserPlaylists ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+.UserPlaylists li {
+    font-size: 1.125rem;
+    margin-bottom: 10px;
+    cursor: pointer; 
+    transition: color 0.3s; 
+  }
+  
+.UserPlaylists li:hover {
+    color: magenta;
+  }
