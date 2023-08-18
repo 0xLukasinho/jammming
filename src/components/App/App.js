@@ -6,7 +6,7 @@ import './App.css';
 import SearchBar from './../SearchBar/Searchbar';
 import SearchResults from './../SearchResults/SearchResults';
 import Playlist from './../Playlist/Playlist';
-import UserPlaylists from "../UserPlaylists/UserPlaylists"; // Add this import
+import UserPlaylists from "../UserPlaylists/UserPlaylists"; 
 import { Spotify } from "../../util/spotify";
 
 function App() {
@@ -46,19 +46,44 @@ function App() {
   }, []);
 
   const savePlaylist = useCallback(() => {
-    const trackURIs = playlistTracks.map((track) => track.uri);
+    if (!playlistName || !playlistTracks.length) {
+      return; 
+    }
   
-    Spotify.savePlaylist(playlistName, trackURIs)
-      .then((newPlaylist) => {
-        toast.success("New playlist successfully saved.");
-        setPlaylistName("");
-        setPlaylistTracks([]);
-        setUserPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
+    const trackURIs = playlistTracks.map((track) => track.uri);
+    const existingPlaylist = userPlaylists.find((playlist) => playlist.name === playlistName);
+  
+    if (existingPlaylist) {
+      const playlistId = existingPlaylist.id;
+      const accessToken = Spotify.getAccessToken();
+      const headers = { Authorization: `Bearer ${accessToken}` };
+  
+      fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        method: 'PUT',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uris: trackURIs }),
       })
-      .catch((error) => {
-        console.error("Error saving new playlist:", error);
-      });
-  }, [playlistName, playlistTracks]);
+        .then(() => {
+          toast.success("Playlist successfully updated.");
+        })
+        .catch((error) => {
+          console.error("Error updating playlist:", error);
+        });
+    } else {
+      Spotify.savePlaylist(playlistName, trackURIs)
+        .then((newPlaylist) => {
+          toast.success("New playlist successfully saved.");
+          setUserPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
+          fetchUserPlaylists();
+        })
+        .catch((error) => {
+          console.error("Error saving new playlist:", error);
+        });
+    }
+  }, [playlistName, playlistTracks, userPlaylists]);
 
   const search = useCallback((term) => {
     Spotify.search(term).then(setSearchResults);
@@ -67,6 +92,11 @@ function App() {
   const selectPlaylist = (selectedPlaylist) => {
     setPlaylistName(selectedPlaylist.name);
     setPlaylistTracks(selectedPlaylist.tracks);
+  };
+
+  const createNewPlaylist = () => {
+    setPlaylistName("New Playlist");
+    setPlaylistTracks([]);
   };
 
   return (
@@ -86,7 +116,11 @@ function App() {
             onNameChange={updatePlaylistName}
             onSave={savePlaylist}
           />
-          <UserPlaylists playlists={userPlaylists} onSelect={selectPlaylist} />
+          <UserPlaylists 
+            playlists={userPlaylists} 
+            onSelect={selectPlaylist}
+            onCreateNewPlaylist={createNewPlaylist}
+          />
         </div>
       </div>
     </div>
