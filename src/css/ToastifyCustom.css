@@ -1,8 +1,12 @@
 .custom-toast {
-    background-color: #ff9900;
-    color: black;
+    background-color: #010c3f;
+    color: white;
 }
 
+.custom-toast .toastify-icon-checkmark {
+    color: magenta;
+  }
+
 .custom-progress-bar {
-    background-color: #ff9900; 
+    background-color: white; 
   }

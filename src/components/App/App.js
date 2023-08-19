@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+import './../../css/ToastifyCustom.css';
 
 import SearchBar from './../SearchBar/Searchbar';
 import SearchResults from './../SearchResults/SearchResults';
@@ -67,7 +68,10 @@ function App() {
         body: JSON.stringify({ uris: trackURIs }),
       })
         .then(() => {
-          toast.success("Playlist successfully updated.");
+          toast.success("Playlist successfully updated.", {
+            className: 'custom-toast',
+            progressClassName: 'custom-progress-bar',
+          });
         })
         .catch((error) => {
           console.error("Error updating playlist:", error);
@@ -75,7 +79,10 @@ function App() {
     } else {
       Spotify.savePlaylist(playlistName, trackURIs)
         .then((newPlaylist) => {
-          toast.success("New playlist successfully saved.");
+          toast.success("New playlist successfully saved.", {
+            className: 'custom-toast',
+            progressClassName: 'custom-progress-bar',
+          });
           setUserPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
           fetchUserPlaylists();
         })

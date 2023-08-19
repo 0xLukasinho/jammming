@@ -2,7 +2,9 @@
     width: 35%;
     border: 1px solid white;
     padding: .88rem;
-    background-color: rgba(1, 12, 63, 0.7);  
+    background-color: rgba(1, 12, 63, 0.7); 
+    max-height: 650px; 
+    overflow-y: scroll;
 }
 
 ::-webkit-scrollbar {

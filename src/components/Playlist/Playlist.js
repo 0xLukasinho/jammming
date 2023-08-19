@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import './Playlist.css';
 
 import TrackList from '../TrackList/Tracklist';
+import saveIcon from './SaveWhite.png'; 
 
 const Playlist = (props) => {
   const handleNameChange = useCallback(
@@ -13,14 +14,21 @@ const Playlist = (props) => {
 
   return (
     <div className="Playlist">
-      <input
-        onChange={handleNameChange}
-        value={props.playlistName || 'New Playlist'} 
-      />
-      <TrackList tracks={props.playlistTracks} onRemove={props.onRemove} isRemoval={true} />
-      <button className="Playlist-save" onClick={props.onSave}>
-        SAVE TO SPOTIFY
-      </button>
+      <div className="Playlist-controls">
+        <input
+          onChange={handleNameChange}
+          value={props.playlistName || 'New Playlist'} 
+        />
+        <img
+          src={saveIcon}
+          alt="Save Icon"
+          className="Playlist-save-icon"
+          onClick={props.onSave}
+        />
+      </div>
+      <div className="Playlist-tracklist">
+        <TrackList tracks={props.playlistTracks} onRemove={props.onRemove} isRemoval={true} />
+      </div>
     </div>
   );
 };

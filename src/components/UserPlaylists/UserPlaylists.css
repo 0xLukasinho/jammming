@@ -2,12 +2,20 @@
     width: 25%;
     border: 1px solid white;
     padding: .88rem;
-    background-color: rgba(1, 12, 63, 0.7);   
+    background-color: rgba(1, 12, 63, 0.7);
+    text-align: center;
+    max-height: 650px; 
+    overflow-y: scroll;   
+}
+
+.UserPlaylists h2 {
+  text-align: left;
 }
 
 .UserPlaylists ul {
     list-style: none;
     padding: 0;
+    text-align: left;
   }
   
 .UserPlaylists li {
@@ -42,4 +50,10 @@
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
+}
+
+@media only screen and (max-width: 1020px) {
+  .UserPlaylists {
+    width: 90%;
+  }
 }
