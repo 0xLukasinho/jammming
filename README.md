@@ -1,6 +1,9 @@
 # Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Project Description
+This app lets you easily access and edit your Spotify playlists, and even create new ones. Check out the video below to see how it works:
+https://github.com/0xLukasinho/PlaylistBuilder/assets/98915377/cb6f50b1-d99f-41cb-ac63-de3a0f92f9b7
+
 
 ## Available Scripts
 
