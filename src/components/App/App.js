@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 import './../../css/ToastifyCustom.css';
 
-import SearchBar from './../SearchBar/SearchBar';
+import SearchBar from './../SearchBar/Searchbar';
 import SearchResults from './../SearchResults/SearchResults';
 import Playlist from './../Playlist/Playlist';
 import UserPlaylists from "../UserPlaylists/UserPlaylists"; 
@@ -12,7 +12,7 @@ import { Spotify } from "../../util/spotify";
 
 function App() {
   const [searchResults, setSearchResults] = useState([]);
-  const [playlistName, setPlaylistName] = useState("New Playlist");
+  const [playlistName, setPlaylistName] = useState("");
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [userPlaylists, setUserPlaylists] = useState([]);
 
@@ -20,13 +20,14 @@ function App() {
     fetchUserPlaylists();
   }, []);
 
-  const fetchUserPlaylists = useCallback(async () => {
-    try {
-      const playlists = await Spotify.getUserPlaylists();
-      setUserPlaylists(playlists);
-    } catch (error) {
-      console.error("Error fetching user playlists:", error);
-    }
+  const fetchUserPlaylists = useCallback(() => {
+    Spotify.getUserPlaylists()
+      .then((playlists) => {
+        setUserPlaylists(playlists);
+      })
+      .catch((error) => {
+        console.error("Error fetching user playlists:", error);
+      });
   }, []);
 
   const addTrack = useCallback((track) => {
@@ -45,37 +46,49 @@ function App() {
     setPlaylistName(name);
   }, []);
 
-  const savePlaylist = useCallback(async () => {
+  const savePlaylist = useCallback(() => {
     if (!playlistName || !playlistTracks.length) {
       return; 
     }
-
+  
     const trackURIs = playlistTracks.map((track) => track.uri);
     const existingPlaylist = userPlaylists.find((playlist) => playlist.name === playlistName);
-
+  
     if (existingPlaylist) {
       const playlistId = existingPlaylist.id;
-      try {
-        await Spotify.updatePlaylist(playlistId, trackURIs);
-        toast.success("Playlist successfully updated.", {
-          className: 'custom-toast',
-          progressClassName: 'custom-progress-bar',
+      const accessToken = Spotify.getAccessToken();
+      const headers = { Authorization: `Bearer ${accessToken}` };
+  
+      fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
+        method: 'PUT',
+        headers: {
+          ...headers,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ uris: trackURIs }),
+      })
+        .then(() => {
+          toast.success("Playlist successfully updated.", {
+            className: 'custom-toast',
+            progressClassName: 'custom-progress-bar',
+          });
+        })
+        .catch((error) => {
+          console.error("Error updating playlist:", error);
         });
-      } catch (error) {
-        console.error("Error updating playlist:", error);
-      }
     } else {
-      try {
-        const newPlaylist = await Spotify.savePlaylist(playlistName, trackURIs);
-        toast.success("New playlist successfully saved.", {
-          className: 'custom-toast',
-          progressClassName: 'custom-progress-bar',
+      Spotify.savePlaylist(playlistName, trackURIs)
+        .then((newPlaylist) => {
+          toast.success("New playlist successfully saved.", {
+            className: 'custom-toast',
+            progressClassName: 'custom-progress-bar',
+          });
+          setUserPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
+          fetchUserPlaylists();
+        })
+        .catch((error) => {
+          console.error("Error saving new playlist:", error);
         });
-        setUserPlaylists((prevPlaylists) => [...prevPlaylists, newPlaylist]);
-        fetchUserPlaylists();
-      } catch (error) {
-        console.error("Error saving new playlist:", error);
-      }
     }
   }, [playlistName, playlistTracks, userPlaylists]);
 
